@@ -1,10 +1,3 @@
-//const { application } = require("express")
-
-//Bienvenida
-let name = ""
-name = prompt("Cual es tu nombre?")
-alert("Bienvenido " + name)
-
 //IniciarJuego
 const seccionAtaque = document.getElementById("seleccionar-ataque")
 const OcultarReinicio = document.getElementById("boton-reinicio")
@@ -12,13 +5,12 @@ const botonMascotaJugador = document.getElementById('boton-mascota')
 const botonReinicio = document.getElementById("boton-reinicio")
 const contenedorTarjetas = document.getElementById("Contenedor-Tarjetas")
 //seleccionarMascotaJugador
-const spanMascotaJugador = document.getElementById('mascota-jugador')
 const seccionMascota = document.getElementById("seleccionar-mascota")  
 const Imagen = new Image (80);
-const MascotaIMG = document.querySelector("#Ataques-Jugador").appendChild(Imagen);
+document.querySelector("#Ataques-Jugador").appendChild(Imagen);
 //seleccionarMascotaEnemigo
 const EImagen = new Image (80);
-const EMascotaIMG = document.querySelector("#Ataques-Enemigo").appendChild(EImagen);
+document.querySelector("#Ataques-Enemigo").appendChild(EImagen);
 //Combate
 const spanVidasMascota = document.getElementById("vidas-mascota")
 const spanVidasEnemigo = document.getElementById("vidas-enemigo")
@@ -35,48 +27,28 @@ const Imapa = new Image ();
 Imapa.src = "./Material/Mapa.jpg"
 const MaxACH = 800
 
-let jugadorid = null
 let Slimes = []
+let enemigos = []
 let ataqueEnemigo = []
 let ataqueJugador = []
 let indexAtaqueJugador
 let indexAtaqueEnemigo
 let mascotaJugador
 let mascotaJugadorObj
-let ImagenFuego = new Image()
-let ImagenCharco = new Image()
-let ImagenMaraña = new Image()
-let ImagenDorado = new Image()
-let ataquesSlime
 let ataquesSlimeEnemigo
-let botonFuego 
-let botonAgua 
-let botonTierra 
-let botonGOLD
 let botonesA = []
-let OpcionDeSlimes
-let inputFuego 
-let inputCharco 
-let inputMaraña 
-let inputDorado
 let VictoriasJugador = 0
 let VictoriasEnemigo = 0
-let resultadoFinal
-let Fondito = document.getElementById("Movimiento")
-let Lienzo = nuestroMapa.getContext("2d")
+const Lienzo = nuestroMapa.getContext("2d")
 let intervalo 
-let ALTMapa
-let ACHMapa = window.innerWidth - 20
-ALTMapa = ACHMapa * 800 / 1600
-if (ACHMapa > MaxACH) {
-    ACHMapa = MaxACH - 20
-    ALTMapa = 400
-}
+const ACHMapa = Math.max(240, Math.min(MaxACH - 20, window.innerWidth - 20))
+const ALTMapa = ACHMapa / 2
+let combateActivo = false
 nuestroMapa.width = ACHMapa
 nuestroMapa.height = ALTMapa
 
 class Slime {
-    constructor(nombre, foto, vida, fotomapa){
+    constructor(nombre, foto, vida){
         this.nombre = nombre
         this.foto = foto
         this.vida = vida
@@ -107,38 +79,38 @@ let Maraña = new Slime("Maraña", "./Material/Maraña.jpeg", 3)
 let Dorado = new Slime("Dorado", "./Material/Gold_Slime.jpeg", 6) 
 
 const FuegoAtaq = [    
-    {nombre: "FUEGO", id: "boton-fuego"},
-    {nombre: "AGUA", id: "boton-agua"},
-    {nombre: "FUEGO", id: "boton-fuego"},
-    {nombre: "TIERRA", id: "boton-tierra"},
-    {nombre: "FUEGO", id: "boton-fuego"}
+    {nombre: "FUEGO"},
+    {nombre: "AGUA"},
+    {nombre: "FUEGO"},
+    {nombre: "TIERRA"},
+    {nombre: "FUEGO"}
 ]
 Fuego.ataques.push(...FuegoAtaq)
 
 const CharcoAtaq = [    
-    {nombre: "AGUA", id: "boton-agua"},
-    {nombre: "FUEGO", id: "boton-fuego"},
-    {nombre: "AGUA", id: "boton-agua"},
-    {nombre: "TIERRA", id: "boton-tierra"},
-    {nombre: "AGUA", id: "boton-agua"}
+    {nombre: "AGUA"},
+    {nombre: "FUEGO"},
+    {nombre: "AGUA"},
+    {nombre: "TIERRA"},
+    {nombre: "AGUA"}
 ]
 Charco.ataques.push(...CharcoAtaq)
 
 const MarañaAtaq = [
-    {nombre: "TIERRA", id: "boton-tierra"},
-    {nombre: "AGUA", id: "boton-agua"},
-    {nombre: "TIERRA", id: "boton-tierra"},
-    {nombre: "FUEGO", id: "boton-fuego"},
-    {nombre: "TIERRA", id: "boton-tierra"}
+    {nombre: "TIERRA"},
+    {nombre: "AGUA"},
+    {nombre: "TIERRA"},
+    {nombre: "FUEGO"},
+    {nombre: "TIERRA"}
 ]
 Maraña.ataques.push(...MarañaAtaq)
 
 const DoradoAtaq = [
-    {nombre: "ORO", id: "boton-dorado"},
-    {nombre: "AGUA", id: "boton-agua"},
-    {nombre: "FUEGO", id: "boton-fuego"},
-    {nombre: "TIERRA", id: "boton-tierra"},
-    {nombre: "AGUA", id: "boton-agua"}
+    {nombre: "ORO"},
+    {nombre: "AGUA"},
+    {nombre: "FUEGO"},
+    {nombre: "TIERRA"},
+    {nombre: "AGUA"}
 ]
 Dorado.ataques.push(...DoradoAtaq)  
     
@@ -150,18 +122,14 @@ function iniciarJuego() {
     seccionMapa.style.display = "none"
 //Slimes
     Slimes.forEach((slime) => {
-        OpcionDeSlimes = `
-        <input type="radio" name="mascota" id=${slime.nombre} />
-        <label class="tarjetaSlime" for=${slime.nombre}>
-            <p><strong>${slime.nombre}</strong></p>
-            <img src=${slime.foto} alt=${slime.nombre}>
-        </label>
-        `
-    contenedorTarjetas.innerHTML += OpcionDeSlimes
-        inputFuego = document.getElementById('Fuego')
-        inputCharco = document.getElementById('Charco')
-        inputMaraña = document.getElementById('Maraña')
-        inputDorado = document.getElementById("Dorado")
+    const opcionDeSlimes = `
+    <input type="radio" name="mascota" id=${slime.nombre} />
+    <label class="tarjetaSlime" for=${slime.nombre}>
+        <p><strong>${slime.nombre}</strong></p>
+        <img src=${slime.foto} alt=${slime.nombre}>
+    </label>
+    `
+    contenedorTarjetas.innerHTML += opcionDeSlimes
     })
 //Ocultar Reinicio
     OcultarReinicio.style.display = "none"
@@ -169,117 +137,45 @@ function iniciarJuego() {
     botonMascotaJugador.addEventListener('click', seleccionarMascotaJugador)
 //reinicio
     botonReinicio.addEventListener("click", reiniciarJuego)
-//id
-    unirseAlJuego()
-}
-function unirseAlJuego() {
-    fetch("http://localhost:8080/unirse")
-    .then(function (res){
-        if (res.ok) {
-            res.text()
-            .then(function(respuesta){
-                console.log(respuesta)
-                jugadorid = respuesta
-            })
-        }
-    })
 }
 function seleccionarMascotaJugador() {
-    //deshabilitar boton
-    botonMascotaJugador.disabled = true
-    //ocultar Mascota
-    seccionMascota.style.display = "none"
-    if (inputFuego.checked) {
-        var MascotaIMG
-        Imagen.src = "./Material/Fuego.jpeg";
-        mascotaJugador = inputFuego.id
-    } else if (inputCharco.checked) {
-        var MascotaIMG
-        Imagen.src = "./Material/Charco.jpeg";
-        mascotaJugador = inputCharco.id
-    } else if (inputMaraña.checked) {
-        var MascotaIMG
-        Imagen.src = "./Material/Maraña.jpeg";
-        mascotaJugador = inputMaraña.id
-    } else if (inputDorado.checked) {
-        var MascotaIMG
-        Imagen.src = "./Material/Gold_Slime.jpeg"
-        mascotaJugador = inputDorado.id
-    } else  {
-        alert("No ha seleccionado tu slime")
-        reiniciarJuego()
+    const seleccion = document.querySelector('input[name="mascota"]:checked')
+    if (!seleccion) {
+        alert("Selecciona un slime antes de continuar")
+        return
     }
-    seleccionarSlime(mascotaJugador)
+
+    botonMascotaJugador.disabled = true
+    seccionMascota.style.display = "none"
+    mascotaJugador = seleccion.id
+    Imagen.src = Slimes.find((slime) => slime.nombre === mascotaJugador).foto
     extaerAtaques(mascotaJugador)
     seccionMapa.style.display = "flex"
     Botn.style.display = "flex"
     IniciarMapa()
 }
-function seleccionarSlime(mascotaJugador) {
-    fetch(`http://localhost:8080/slime/${jugadorid}`,{
-        method: "post",
-        headers: {
-            "Content-Type": "application/json"
-        }, body: JSON.stringify({
-            slime: mascotaJugador
-        })
-    });
-}
 function pintarCanvas(){
     mascotaJugadorObj.x = mascotaJugadorObj.x + mascotaJugadorObj.velocidadX
     mascotaJugadorObj.y = mascotaJugadorObj.y + mascotaJugadorObj.velocidadY
+    mascotaJugadorObj.x = Math.max(0, Math.min(nuestroMapa.width - mascotaJugadorObj.ancho, mascotaJugadorObj.x))
+    mascotaJugadorObj.y = Math.max(0, Math.min(nuestroMapa.height - mascotaJugadorObj.alto, mascotaJugadorObj.y))
     Lienzo.clearRect(0, 0, nuestroMapa.width, nuestroMapa.height)
-    Lienzo.drawImage(
-        Imapa,
-        0,
-        0,
-        nuestroMapa.width,
-        nuestroMapa.height
-    )
-    mascotaJugadorObj.pintarSlime()
-    enviarPosicion(mascotaJugadorObj.x, mascotaJugadorObj.y)
-    if (mascotaJugadorObj.velocidadX !== 0 || mascotaJugadorObj.velocidadY !== 0) {
-        revisarColision(FuegoE)
-        revisarColision(CharcoE)
-        revisarColision(MarañaE)
-        revisarColision(DoradoE)
+    if (Imapa.complete && Imapa.naturalWidth) {
+        Lienzo.drawImage(Imapa, 0, 0, nuestroMapa.width, nuestroMapa.height)
     }
-}
-function enviarPosicion(x, y) {
-    fetch(`http://localhost:8080/slime/${jugadorid}/posicion`,{
-        method: "post",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({x, y})
-    }).then(function(res){
-        if (res.ok){
-            res.json()
-            .then(function({enemigos}){
-                console.log(enemigos)
-                enemigos.forEach(function (enemigo) {
-                    let slimeEnemigo = null
-                    const slimeNombre = enemigo.slime.nombre || ""
-                    if (slimeNombre === "Fuego") {
-                        slimeEnemigo = new Slime("Fuego", "./Material/EI.png", 3) 
-                    }else if (slimeNombre === "Charco") {
-                        slimeEnemigo = new Slime("Charco", "./Material/EI.png", 3) 
-                    }else if (slimeNombre === "Maraña") {
-                        slimeEnemigo = new Slime("Maraña", "./Material/EI.png", 3) 
-                    }else if (slimeNombre === "Dorado") {
-                        slimeEnemigo = new Slime("Dorado", "./Material/EI.png", 6) 
-                    }
-                    slimeEnemigo.pintarSlime()
-                    slimeEnemigo.x
-                })
-            })
+    enemigos.forEach((enemigo) => enemigo.pintarSlime())
+    mascotaJugadorObj.pintarSlime()
+    if (mascotaJugadorObj.velocidadX !== 0 || mascotaJugadorObj.velocidadY !== 0) {
+        for (const enemigo of enemigos) {
+            revisarColision(enemigo)
+            if (combateActivo) {
+                break
+            }
         }
-    })
+    }
 }
 function SlimeM(){
-    for (let i = 0; i < Slimes.length; i++) {
-        if (mascotaJugador === Slimes[i].nombre) {
-            return Slimes[i]
-        }
-    }
+    return Slimes.find((slime) => mascotaJugador === slime.nombre)
 }
 function moverSlimeD(){
     mascotaJugadorObj.velocidadX = 5
@@ -295,7 +191,6 @@ function moverSlimeAB(){
 
 }
 function Teclas(event){
-    console.log(event.key)
     switch (event.key) {
         case "w":
             moverSlimeAB()
@@ -331,92 +226,49 @@ function detenerSlime(){
 }
 
 function extaerAtaques(){
-    let ataques
-    for (let i = 0; i < Slimes.length; i++) {
-        if (mascotaJugador === Slimes[i].nombre) {
-            ataques = Slimes[i].ataques
-        }
-    }
-    mostrarAtaques(ataques)
+    mostrarAtaques(SlimeM().ataques)
 }
 
 function mostrarAtaques(ataques){
     ataques.forEach((ataque) => {
-        ataquesSlime = `
-        <button id=${ataque.id} class="Botones-de-Fuego BAtaque"><strong>${ataque.nombre}</strong></button>
+        const botonAtaque = `
+        <button class="Botones-de-Fuego BAtaque"><strong>${ataque.nombre}</strong></button>
         `
-        contenedorAtaques.innerHTML += ataquesSlime
+        contenedorAtaques.innerHTML += botonAtaque
     })
-    botonFuego = document.getElementById('boton-fuego')
-    botonAgua = document.getElementById('boton-agua')
-    botonTierra = document.getElementById('boton-tierra')
-    botonGOLD = document.getElementById('boton-Dorado')
     botonesA = document.querySelectorAll(".BAtaque")
+    secuenciaAtaque()
 }
 
 function secuenciaAtaque(){
     botonesA.forEach((boton) =>{
         boton.addEventListener("click", (e) => {
-            if (e.target.textContent === "FUEGO"){
-                ataqueJugador.push("FUEGO")
-                console.log(ataqueJugador)
-                boton.style.background = "#BBBFCA"
-                boton.disabled = true
-            }else if(e.target.textContent === "AGUA"){
-                ataqueJugador.push("AGUA")
-                console.log(ataqueJugador)
-                boton.style.background = "#BBBFCA"
-                boton.disabled = true
-            }else if(e.target.textContent === "ORO"){
-                ataqueJugador.push("ORO")
-                console.log(ataqueJugador)
-                boton.style.background = "#BBBFCA"
-                boton.disabled = true
-            }else {
-                ataqueJugador.push("TIERRA")
-                console.log(ataqueJugador)
-                boton.style.background = "#BBBFCA" 
-                boton.disabled = true
-            }
+            const ataque = e.currentTarget.textContent.trim()
+            ataqueJugador.push(ataque)
+            boton.style.background = "#BBBFCA"
+            boton.disabled = true
             ataqueAleatorioEnemigo()
         })
     })
 }
 
 function seleccionarMascotaEnemigo(enemigo) {
-    let mascotaAleatoria = aleatorio(0 ,Slimes.length -1)
-    if (mascotaAleatoria == 0) {
-        var EMascotaIMG
-        EImagen.src = "./Material/Fuego.jpeg";
-    } else if (mascotaAleatoria == 1) {
-        var EMascotaIMG
-        EImagen.src = "./Material/Charco.jpeg";
-    } else if (mascotaAleatoria == 2){
-        var EMascotaIMG
-        EImagen.src = "./Material/Maraña.jpeg";
-    }else {
-        var EMascotaIMG
-        EImagen.src = "./Material/Gold_Slime.jpeg";
-    }
+    combateActivo = true
+    EImagen.src = enemigo.foto
     ataquesSlimeEnemigo = enemigo.ataques
-    secuenciaAtaque()
+    ataqueJugador = []
+    ataqueEnemigo = []
+    AtaquesJugador.querySelectorAll("p").forEach((ataque) => ataque.remove())
+    AtaquesEnemigo.querySelectorAll("p").forEach((ataque) => ataque.remove())
+    spanVidasMascota.textContent = "0"
+    spanVidasEnemigo.textContent = "0"
+    contenedorAtaques.innerHTML = ""
+    mostrarAtaques(SlimeM().ataques)
 }
 
 function ataqueAleatorioEnemigo() {
-    let ataqueAleatorio = aleatorio(0 ,ataquesSlimeEnemigo.length)
-
-    if (ataqueAleatorio == 0 || ataqueAleatorio == 1) {
-        ataqueEnemigo.push('FUEGO')
-    } else if (ataqueAleatorio == 2 || ataqueAleatorio == 3) {
-        ataqueEnemigo.push('AGUA')
-    } else if (ataqueAleatorio == 3 || ataqueAleatorio == 4) {
-        ataqueEnemigo.push('TIERRA')
-    }else if (ataqueAleatorio == 5){
-        ataqueEnemigo.push('AGUA')
-    }else if (mascotaAleatoria == 4 && ataqueAleatorio == 5) {
-        ataqueEnemigo.push('ORO') 
-    }
-    console.log(ataqueEnemigo)
+    const ataqueAleatorio = aleatorio(0, ataquesSlimeEnemigo.length - 1)
+    ataqueEnemigo.push(ataquesSlimeEnemigo[ataqueAleatorio].nombre)
     inciarPelea()
 }
 
@@ -433,57 +285,45 @@ function indexAmbosOponentes(jugador, enemigo){
 
 function combate() {
     for (let index = 0; index < ataqueJugador.length; index++) {
-        if (ataqueJugador[index] === ataqueEnemigo[index]) {
-            indexAmbosOponentes(index, index)
+        indexAmbosOponentes(index, index)
+        const resultado = resultadoAtaque(indexAtaqueJugador, indexAtaqueEnemigo)
+        if (resultado === 0) {
             crearMensaje("VAYA, SON IGUALES!")
-        }else if (ataqueJugador[index] ==="FUEGO" && ataqueEnemigo[index] === "TIERRA") {
-            indexAmbosOponentes(index, index)
-            crearMensaje("BIEN HECHO, QUE SE HAGA EL FUEGO!")
+        } else if (resultado > 0) {
+            crearMensaje("GANASTE ESTA RONDA!")
             VictoriasJugador++
-            spanVidasMascota.innerHTML = VictoriasJugador
-        }else if (ataqueJugador[index] ==="FUEGO" && ataqueEnemigo[index] === "ORO") {
-            indexAmbosOponentes(index, index)
-            crearMensaje("BIEN HECHO, QUE SE HAGA EL FUEGO!")
-            VictoriasJugador++
-            spanVidasMascota.innerHTML = VictoriasJugador
-        }else if (ataqueJugador[index] ==="AGUA" && ataqueEnemigo[index] === "FUEGO") {
-            indexAmbosOponentes(index, index)
-            crearMensaje("EXCELENTE, SU LLAMA NO TE AFECTA!")
-            VictoriasJugador++
-            spanVidasMascota.innerHTML = VictoriasJugador
-        }else if (ataqueJugador[index] ==="TIERRA" && ataqueEnemigo[index] === "AGUA") {
-            indexAmbosOponentes(index, index)
-            crearMensaje("VAMOS, EL NO PASARA!")
-            VictoriasJugador++
-            spanVidasMascota.innerHTML = VictoriasJugador
-        }else if (ataqueJugador[index] ==="ORO" && ataqueEnemigo[index] === "AGUA") {
-            indexAmbosOponentes(index, index)
-            crearMensaje("INCREIBLE!, TAN BRILLANTE!")
-            VictoriasJugador++
-            spanVidasMascota.innerHTML = VictoriasJugador
-        }else if (ataqueJugador[index] ==="ORO" && ataqueEnemigo[index] === "TIERRA") {
-            indexAmbosOponentes(index, index)
-            crearMensaje("INCREIBLE!, TAN BRILLANTE!")
-            VictoriasJugador++
-            spanVidasMascota.innerHTML = VictoriasJugador
+            spanVidasMascota.textContent = VictoriasJugador
         }else {
-            indexAmbosOponentes(index, index)
             crearMensaje("OH NO, TU ENEMIGO TE VENCIO!")
             VictoriasEnemigo++
-            spanVidasEnemigo.innerHTML = VictoriasEnemigo
+            spanVidasEnemigo.textContent = VictoriasEnemigo
         }
     }
     revisarTablas()
 }
 
+function resultadoAtaque(jugador, enemigo) {
+    if (jugador === enemigo) {
+        return 0
+    }
+    const ganaContra = {
+        FUEGO: ["TIERRA", "ORO"],
+        AGUA: ["FUEGO"],
+        TIERRA: ["AGUA"],
+        ORO: ["AGUA", "TIERRA"]
+    }
+    return ganaContra[jugador].includes(enemigo) ? 1 : -1
+}
+
 function revisarTablas() {
-    if (VictoriasJugador == VictoriasEnemigo){
+    if (VictoriasJugador === VictoriasEnemigo){
         crearMensajeFinal("ESTO FUE ALGO INESPERADO, EMPATE")
     }else if (VictoriasJugador > VictoriasEnemigo){
         crearMensajeFinal("PERFECTO, ERES MUY FUERTE!")
     }else {
         crearMensajeFinal("YA LO SUPONIA, ERES DEBIL!")
     }
+    botonesA.forEach((boton) => { boton.disabled = true })
 }
 
 function crearMensaje(resultado) {
@@ -513,21 +353,25 @@ function aleatorio(min, max) {
 }
 function IniciarMapa(){
     mascotaJugadorObj = SlimeM(mascotaJugador)
+    enemigos = Slimes
+        .filter((slime) => slime.nombre !== mascotaJugador)
+        .map((slime, index, lista) => {
+            const enemigo = new Slime(slime.nombre, slime.foto, slime.vida)
+            enemigo.ataques = slime.ataques
+            enemigo.x = (index + 1) * nuestroMapa.width / (lista.length + 1) - enemigo.ancho / 2
+            enemigo.y = index % 2 === 0 ? 20 : nuestroMapa.height - enemigo.alto - 20
+            return enemigo
+        })
     intervalo = setInterval(pintarCanvas, 50)
     window.addEventListener('keydown', Teclas)
     window.addEventListener("keyup", detenerSlime)
 }
 function revisarColision(enemigo){
-    const arribaE = enemigo.y + 25
-    const abajoE = enemigo.y + enemigo.alto - 25
-    const derechaE = enemigo.x + enemigo.ancho - 25
-    const izquierdaE = enemigo.x + 25
-    const arribaJ = mascotaJugadorObj.y
-    const abajoJ = mascotaJugadorObj.y + mascotaJugadorObj.alto
-    const derechaJ = mascotaJugadorObj.x + mascotaJugadorObj.ancho
-    const izquierdaJ = mascotaJugadorObj.x 
-
-    if (abajoJ<arribaE || arribaJ > abajoE || derechaJ < izquierdaE || izquierdaJ > derechaE) {
+    const seSeparan = mascotaJugadorObj.x + mascotaJugadorObj.ancho < enemigo.x ||
+        mascotaJugadorObj.x > enemigo.x + enemigo.ancho ||
+        mascotaJugadorObj.y + mascotaJugadorObj.alto < enemigo.y ||
+        mascotaJugadorObj.y > enemigo.y + enemigo.alto
+    if (seSeparan || combateActivo) {
         return 
     }
     detenerSlime()
