@@ -7,7 +7,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-<section id="seleccionar-mascota">
+<section id="seleccionar-sala">
+    <h1 class="titulo">SLIME BATTLE</h1>
+    <h2 class="subtitulo">Juega en línea</h2>
+    <p id="estado-sala" role="status">Crea una sala o únete con el código de tu amigo.</p>
+    <div class="controles-sala">
+        <button id="crear-sala">Crear sala</button>
+        <input id="codigo-sala" type="text" maxlength="8" placeholder="Código de sala" aria-label="Código de sala">
+        <button id="unirse-sala">Unirse</button>
+    </div>
+    <p id="compartir-sala" hidden>
+        Comparte este enlace con tu rival:
+        <input id="enlace-sala" type="text" readonly aria-label="Enlace para compartir">
+        <button id="copiar-enlace">Copiar enlace</button>
+    </p>
+    <button id="jugar-solo">Practicar sin conexión</button>
+</section>
+
+<section id="seleccionar-mascota" style="display: none;">
     <h1 class="titulo"> SLIME BATTLE</h1>
     <h2 class="subtitulo">    Elige tu slime:</h2>
     <div id="Contenedor-Tarjetas" class="tarjetas">
@@ -16,20 +33,21 @@
     <button id="boton-mascota"><strong>ATRAPALO!</strong></button>
 </section>
 
-<section id="MAPA">
+<section id="MAPA" style="display: none;">
     <h2 class="titulo3">MAPA</h2>
     <canvas id="BUSCA"></canvas>
+    <p id="estado-juego" role="status" aria-live="polite"></p>
 </section>
 <section id="Movimiento">
-    <button id="mover-derecha" onmouseup="detenerSlime()" onmousedown="moverSlimeD()">➡</button>
+    <button id="mover-derecha" aria-label="Mover a la derecha">➡</button>
 <div>
-    <button id="mover-izquierda" onmouseup="detenerSlime()" onmousedown="moverSlimeI()">⬅</button>
-    <button id="mover-abajo" onmouseup="detenerSlime()" onmousedown="moverSlimeA()">⬇</button>
-    <button id="mover-arriba" onmouseup="detenerSlime()" onmousedown="moverSlimeAB()">⬆</button>
+    <button id="mover-izquierda" aria-label="Mover a la izquierda">⬅</button>
+    <button id="mover-abajo" aria-label="Mover hacia abajo">⬇</button>
+    <button id="mover-arriba" aria-label="Mover hacia arriba">⬆</button>
 </div>
 </section>
 
-<section id="seleccionar-ataque">
+<section id="seleccionar-ataque" style="display: none;">
     <h1 class="titulo2">SLIME BATTLE</h1>
     <h2 class="subtitulo2">Elige tus ataques:</h2>
     <div id="contenedor-Ataques" class="Botoncitos">
@@ -54,9 +72,9 @@
             <div id="Ataques-Enemigo"></div>
         </div>
     </div>
-
-    </div>
 </section>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./supabase-config.js"></script>
 <script src="./mopekon.js"></script>
 </body>
 </html>

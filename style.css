@@ -8,6 +8,56 @@
 body{
     font-family: 'Fredoka One', cursive;
 }
+#seleccionar-sala{
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: white;
+}
+.controles-sala{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+}
+#crear-sala, #unirse-sala, #jugar-solo, #copiar-enlace{
+    border: 2px solid #F94892;
+    border-radius: 12px;
+    background: white;
+    color: #F94892;
+    padding: 10px 14px;
+    font: inherit;
+    cursor: pointer;
+}
+#crear-sala:hover, #unirse-sala:hover, #jugar-solo:hover, #copiar-enlace:hover{
+    background-color: #BBBFCA;
+}
+#codigo-sala, #enlace-sala{
+    box-sizing: border-box;
+    max-width: 90vw;
+    border: 2px solid #F94892;
+    border-radius: 10px;
+    padding: 10px;
+    font: inherit;
+}
+#codigo-sala{
+    width: 180px;
+    text-transform: uppercase;
+}
+#enlace-sala{
+    width: 360px;
+}
+#estado-sala{
+    min-height: 1.5em;
+    max-width: 520px;
+    overflow-wrap: anywhere;
+}
+#jugar-solo{
+    margin-top: 20px;
+}
 
 .titulo {
     color: #F94892;
